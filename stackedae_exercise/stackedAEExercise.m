@@ -42,10 +42,12 @@ beta = 3;              % weight of sparsity penalty term
 trainData = loadMNISTImages('../train-images-idx3-ubyte');
 trainLabels = loadMNISTLabels('../train-labels-idx1-ubyte');
 
-DEBUG = true;
+% for test by Jerry
+DEBUG = false;
+debugSize = 10;
 if DEBUG
-	trainData = trainData(:, 1:100);
-	trainLabels = trainLabels(1:100);
+	trainData = trainData(:, 1:debugSize);
+	trainLabels = trainLabels(1:debugSize);
 end
 
 trainLabels(trainLabels == 0) = 10; % Remap 0 to 10 since our labels need to start from 1
@@ -77,6 +79,7 @@ options.maxIter = 400;	  % Maximum number of iterations of L-BFGS to run
 options.display = 'on';
 
 fprintf('begin STEP2-L1\n');
+% please set the input output size and theta
 [sae1OptTheta, cost] = minFunc( @(p) sparseAutoencoderCost(p, ...
                                    inputSize, hiddenSizeL1, ...
                                    lambda, sparsityParam, ...
@@ -213,7 +216,7 @@ fprintf('Finetune softmax model\n');
 [stackedAEOptTheta, cost] = minFunc( @(p) stackedAECost(p, ...
                                    inputSize, hiddenSizeL2, ...
                                    numClasses, netconfig, ...
-                                   lambda, beta, trainData, trainLabels), ...
+                                   lambda, trainData, trainLabels), ...
                               stackedAETheta, options);
 
 

@@ -36,8 +36,9 @@ end
 cost = 0; % You need to compute this
 
 % You might find these variables useful
-M = size(data, 2);
+M = size(data, 2); % number of training data
 groundTruth = full(sparse(labels, 1:M, 1));
+%(label(i), i) put the m col with row numbered with label
 
 
 %% --------------------------- YOUR CODE HERE -----------------------------
@@ -64,33 +65,38 @@ groundTruth = full(sparse(labels, 1:M, 1));
 
 %% phase 1: forward propogation
 
-z2 = stack{1}.w*data + repmat(stack{1}.b, 1, M);
+z2 = stack{1}.w * data + repmat(stack{1}.b, 1, M);
 a2 = sigmoid(z2);
-z3 = stack{2}.w*a2 + repmat(stack{2}.b, 1, M);
+z3 = stack{2}.w * a2 + repmat(stack{2}.b, 1, size(a2,2));
 a3 = sigmoid(z3); % also known as h_W,b(x) / f(z^(3))
 
 % gradient for softmaxTehtaGrad
-Mat = theta * data; % numClasses * numFeatures
-Mat = bsxfun(@minus, Mat, max(Mat, [], 1)); % devide minus the max of the row
+Mat = softmaxTheta * a3; % 
+Mat = bsxfun(@minus, Mat, max(Mat)); % minus the max of the row
 fenzi = exp(Mat);
 P = bsxfun(@rdivide, fenzi, sum(fenzi)); % devide each column by column sum
 
-delta3 = softmaxTheta*(labels - P) .* sigmodinv(a3); %-\Delta_a^(n;)J * f'(z^(l))
 
-delta2 = stack{2}.w*delta3 .* sigmodinv(a2);
-delta1 = stack{1}.w*delta2 .* sigmodinv(a1);
+%% softmax cost + weightdecay  log(P) * groundTruth'?
+% cost = -1/M * sum(log(P) .* groundTruth) + lambda/2 * sum(softmaxTheta.^2);
+cost = -1/M * groundTruth(:)'*log(P(:)) + lambda/2 * sum(softmaxTheta(:).^2);
 
-% backpropogation gradient
-stackgrad{1}.w = delta2*a1;
-stackgrad{2}.w = delta3*a2;
-stackgrad{1}.b = delta2;
-stackgrad{2}.b = delta1;
+%% theta^T*(I-P)
+delta3 = -softmaxTheta' * (groundTruth - P) .* sigmodinv(a3); %-\Delta_a^(n;)J * f'(z^(l))
 
-% softmax theta gradient
+delta2 = stack{2}.w' * delta3 .* sigmodinv(a2);
+% delta1 = stack{1}.w' * delta2 .* sigmodinv(data);
+
+%% backpropogation gradient
+% 1/numClasses?
+stackgrad{1}.w = 1/M * delta2*data';
+stackgrad{2}.w = 1/M * delta3*a2';
+stackgrad{1}.b = 1/M * sum(delta2, 2);
+stackgrad{2}.b = 1/M * sum(delta3, 2);
+
+% softmax theta gradient M or numClasses?
 softmaxThetaGrad = -1/M*( (groundTruth-P)*a3' ) + lambda*softmaxTheta;
 
-% softmax cost + weightdecay
-cost = -1/M * sum(sum(log(P) .* groundTruth)) + lambda/2 * sum(sum(theta.^2));
 
 % -------------------------------------------------------------------------
 
@@ -106,5 +112,5 @@ function sigm = sigmoid(x)
 end
 
 function sigm = sigmodinv(x)
-	sigm = x*(1-x)
+	sigm = x .* (1-x);
 end
