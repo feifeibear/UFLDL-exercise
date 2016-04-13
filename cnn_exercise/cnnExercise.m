@@ -13,6 +13,8 @@ addpath ../sparseAutoEncoder
 addpath ../stl_exercise
 addpath ../linear_decoder_exercise
 addpath ..
+addpath ../softmax_exercise
+addpath ../minFunc
 %% STEP 0: Initialization
 %  Here we initialize some parameters used for the exercise.
 
@@ -148,7 +150,7 @@ end
 %  convolution and pooling 50 features at a time to avoid running out of
 %  memory. Reduce this number if necessary
 
-stepSize = 50;
+stepSize = 50; % change to 50 will result accuracy to 20%
 assert(mod(hiddenSize, stepSize) == 0, 'stepSize should divide hiddenSize');
 
 load stlTrainSubset.mat % loads numTrainImages, trainImages, trainLabels

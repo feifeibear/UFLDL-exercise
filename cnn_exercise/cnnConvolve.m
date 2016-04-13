@@ -41,6 +41,7 @@ convolvedFeatures = zeros(numFeatures, numImages, imageDim - patchDim + 1, image
 % steps
 
 %fjr code ?
+patchSize = patchDim * patchDim;
 WT = W*ZCAWhite; %hiddenSize * visibleSize = numFeatures * visibleSize
 b_mean = b - WT*meanPatch;
 
