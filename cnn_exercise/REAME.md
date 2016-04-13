@@ -38,7 +38,14 @@ choose small patch the same as sampled patch for training and then do forward pr
 In order to achieve translation invariant, a pooling layer is required after a convulotion layer.
 
 ##BUG report
-In STEP 3: Convolve and pool with the dataset. If I change the stepSize to 50, accuray will decrease to 20%. However, with stepSize as 20, the accuracy is 80%.
-<p>`stepSize = 50; % change to 50 will result accuracy to 20%` 
+NO
 
 ##Questions
+#######How does the WT and b_mean calculated?
+
+#######What does the following code do in cnnConv function?
+      % Flip the feature matrix because of the definition of convolution, as explained later
+      feature = flipud(fliplr(squeeze(feature)));
+      
+      % Obtain the image
+      im = squeeze(images(:, :, channel, imageNum));
